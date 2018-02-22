@@ -9,8 +9,10 @@ import {
   CameraPosition,
   MarkerOptions,
   Marker,
-  GoogleMapsAnimation
+  GoogleMapsAnimation,
+  MyLocation
 } from "@ionic-native/google-maps";
+import { LocationAccuracy } from "@ionic-native/location-accuracy";
 
 @Component({
   selector: "page-home",
@@ -18,7 +20,11 @@ import {
 })
 export class HomePage {
   map: GoogleMap;
-  constructor(public navCtrl: NavController, public platform: Platform) {}
+  constructor(
+    public navCtrl: NavController,
+    public platform: Platform,
+    private locationAccuracy: LocationAccuracy
+  ) {}
 
   ionViewDidLoad() {
     this.platform.ready().then(readySource => {
@@ -44,23 +50,73 @@ export class HomePage {
     // Wait the MAP_READY before using any methods.
     this.map.one(GoogleMapsEvent.MAP_READY).then(() => {
       console.log("Map is ready!");
-
-      // Now you can use all methods safely.
-      this.map
-        .addMarker({
-          title: "Ionic",
-          icon: "blue",
-          animation: "DROP",
-          position: {
-            lat: 11.0168,
-            lng: 76.9558
+      this.pointLocation();
+      setTimeout(() => {
+        this.locationAccuracy.canRequest().then((canRequest: boolean) => {
+          if (canRequest) {
+            this.locationAccuracy
+              .request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY)
+              .then(
+                () => {
+                  this.focusCurrentLocation();
+                  console.log("Request successful");
+                },
+                error => {
+                  console.log("Error requesting location permissions", error);
+                }
+              );
           }
-        })
-        .then(marker => {
-          marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe(() => {
-            alert("clicked");
-          });
         });
+      }, 3000);
     });
+  }
+
+  focusCurrentLocation() {
+    this.map
+      .getMyLocation()
+      .then(
+        (location: MyLocation) => {
+          console.log(JSON.stringify(location, null, 2));
+          return this.map
+            .animateCamera({
+              target: location.latLng,
+              zoom: 17,
+              tilt: 30
+            })
+            .then(() => {
+              return this.map.addMarker({
+                title: "@ionic-native/google-maps current location",
+                snippet: "Probeseven",
+                position: location.latLng,
+                animation: GoogleMapsAnimation.BOUNCE
+              });
+            });
+        },
+        error => {}
+      )
+      .then((marker: Marker) => {
+        marker.showInfoWindow();
+        marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe(() => {
+          alert("clicked!");
+        });
+      });
+  }
+
+  pointLocation() {
+    this.map
+      .addMarker({
+        title: "Ionic",
+        icon: "blue",
+        animation: "DROP",
+        position: {
+          lat: 11.0168,
+          lng: 76.9558
+        }
+      })
+      .then(marker => {
+        marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe(() => {
+          alert("clicked");
+        });
+      });
   }
 }

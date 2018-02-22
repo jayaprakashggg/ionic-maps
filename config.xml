@@ -84,7 +84,10 @@
     <plugin name="cordova-plugin-googlemaps" spec="^2.2.5">
         <variable name="API_KEY_FOR_ANDROID" value="AIzaSyD16a3ip8ikztqZ3T3eggyZYJrS5jNo2Ng" />
         <variable name="API_KEY_FOR_IOS" value="AIzaSyDdB8QerHVquqiiYsAcs2Dl9eNnM30ZnOA" />
+        <variable name="LOCATION_WHEN_IN_USE_DESCRIPTION" value="Show your location on the map" />
+        <variable name="LOCATION_ALWAYS_USAGE_DESCRIPTION" value="Trace your location on the map" />
     </plugin>
     <engine name="android" spec="~6.3.0" />
     <plugin name="cordova-plugin-statusbar" spec="^2.4.1" />
+    <plugin name="cordova-plugin-request-location-accuracy" spec="^2.2.2" />
 </widget>
