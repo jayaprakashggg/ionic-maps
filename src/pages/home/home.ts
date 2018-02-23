@@ -87,6 +87,35 @@ export class HomePage {
           }
         });
       }, 3000);
+
+      this.map.on(GoogleMapsEvent.MAP_CLICK).subscribe(latLng => {
+        let request: GeocoderRequest = {
+          position: { lat: latLng[0].lat, lng: latLng[0].lng }
+        };
+        Geocoder.geocode(request).then(
+          result => {
+            this.map
+              .addMarker({
+                title: result[0].locality,
+                snippet: result[0].extra.lines[0],
+                icon: "green",
+                animation: "DROP",
+                position: {
+                  lat: latLng[0].lat,
+                  lng: latLng[0].lng
+                }
+              })
+              .then(marker => {
+                marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe(() => {
+                  alert(result[0].extra.lines[0]);
+                });
+              });
+          },
+          error => {
+            console.log(error);
+          }
+        );
+      });
     });
   }
 
