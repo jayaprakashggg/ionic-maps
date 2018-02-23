@@ -10,7 +10,9 @@ import {
   MarkerOptions,
   Marker,
   GoogleMapsAnimation,
-  MyLocation
+  MyLocation,
+  Geocoder,
+  GeocoderRequest
 } from "@ionic-native/google-maps";
 import { LocationAccuracy } from "@ionic-native/location-accuracy";
 
@@ -30,6 +32,23 @@ export class HomePage {
     this.platform.ready().then(readySource => {
       console.log("Platform ready from", readySource);
       this.loadMap();
+
+      let request = {
+        address: "Coimbatore"
+      };
+
+      let requestPos: GeocoderRequest = {
+        position: { lat: 11.0219135, lng: 77.0002142 }
+      };
+
+      Geocoder.geocode(request).then(
+        result => {
+          console.log(result);
+        },
+        error => {
+          console.log(error);
+        }
+      );
     });
   }
 
@@ -72,34 +91,44 @@ export class HomePage {
   }
 
   focusCurrentLocation() {
-    this.map
-      .getMyLocation()
-      .then(
-        (location: MyLocation) => {
-          console.log(JSON.stringify(location, null, 2));
-          return this.map
-            .animateCamera({
-              target: location.latLng,
-              zoom: 17,
-              tilt: 30
-            })
-            .then(() => {
-              return this.map.addMarker({
-                title: "@ionic-native/google-maps current location",
-                snippet: "Probeseven",
-                position: location.latLng,
-                animation: GoogleMapsAnimation.BOUNCE
+    this.map.getMyLocation().then(
+      (location: MyLocation) => {
+        console.log(JSON.stringify(location, null, 2));
+        let request: GeocoderRequest = {
+          position: { lat: location.latLng.lat, lng: location.latLng.lng }
+        };
+        Geocoder.geocode(request).then(
+          result => {
+            console.log(result);
+            return this.map
+              .animateCamera({
+                target: location.latLng,
+                zoom: 17,
+                tilt: 30
+              })
+              .then(() => {
+                return this.map
+                  .addMarker({
+                    title: result[0].locality,
+                    snippet: result[0].extra.lines[0],
+                    position: location.latLng,
+                    animation: GoogleMapsAnimation.BOUNCE
+                  })
+                  .then((marker: Marker) => {
+                    marker.showInfoWindow();
+                    marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe(() => {
+                      alert(result[0].extra.lines[0]);
+                    });
+                  });
               });
-            });
-        },
-        error => {}
-      )
-      .then((marker: Marker) => {
-        marker.showInfoWindow();
-        marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe(() => {
-          alert("clicked!");
-        });
-      });
+          },
+          error => {
+            console.log(error);
+          }
+        );
+      },
+      error => {}
+    );
   }
 
   pointLocation() {
