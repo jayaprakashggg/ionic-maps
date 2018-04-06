@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="me.jayaprakash.maps" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>ionic-maps</name>
-    <description>An awesome Ionic/Cordova app.</description>
-    <author email="hi@ionicframework" href="http://ionicframework.com/">Ionic Framework Team</author>
+    <description>An awesome Ionic/Cordova app. Application for creating an google maps and geolocation.</description>
+    <author email="jayaprakashggg@gmail.com" href="http://jayaprakash.me/">jayaprakashggg</author>
     <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
